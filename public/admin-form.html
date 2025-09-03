@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adicionar Projeto - Lalu Dev</title>
+<link rel="stylesheet" href="estilos-publico.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+body { background: radial-gradient(ellipse at bottom, #0a0a0a 0%, #1a1a2e 100%); color: #fff; height: 100vh; overflow: hidden; }
+
+.form-container {
+    position: absolute; top: 10%; left: 50%; transform: translate(-50%, 0);
+    z-index: 10; background: rgba(255, 255, 255, 0.05);
+    padding: 2rem; border-radius: 12px; display: flex; flex-direction: column; align-items: center;
+    backdrop-filter: blur(10px); box-shadow: 0 0 15px rgba(0,0,0,0.5); text-align: center;
+    width: 340px;
+}
+.form-container h1 { margin-bottom: 1rem; font-size: 1.8rem; color: #fff; }
+.form-container input, .form-container textarea, .form-container select {
+    width: 100%; padding: 0.6rem; margin: 0.4rem 0; border-radius: 6px; border: none; outline: none;
+    font-size: 1rem; background: rgba(255,255,255,0.1); color: #fff;
+}
+.form-container button {
+    width: 100%; padding: 0.6rem; border: none; border-radius: 6px;
+    background: #6c5ce7; color: #fff; font-weight: bold; cursor: pointer; transition: all 0.3s ease;
+}
+.form-container button:hover { background: #341f97; transform: scale(1.05); }
+
+/* Estilo do seletor múltiplo */
+select[multiple] {
+    height: 120px;
+    overflow-y: auto;
+}
+option {
+    padding: 5px;
+    background: #1a1a2e;
+    color: #fff;
+}
+option:checked {
+    background: #6c5ce7;
+}
+</style>
+</head>
+<body>
+<div class="form-container">
+    <h1>Adicionar Projeto</h1>
+    <form id="projetoForm" action="/admin-form" method="POST" enctype="multipart/form-data">
+        <input type="text" name="titulo" placeholder="Título" required>
+        <textarea name="descricao" placeholder="Descrição" required></textarea>
+
+        <label style="text-align:left; font-size:0.9rem; color:#bbb; width:100%;">Selecione as tecnologias:</label>
+        <select id="techSelect" multiple required>
+            <option value="HTML">HTML</option>
+            <option value="CSS">CSS</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="Python">Python</option>
+            <option value="React">React</option>
+            <option value="Node.js">Node.js</option>
+            <option value="MySQL">MySQL</option>
+            <option value="SQL">SQL</option>
+            <option value="Power BI">Power BI</option>
+            <option value="Excel">Excel</option>
+            <option value="Java">Java</option>
+            <option value="C#">C#</option>
+            <option value="PHP">PHP</option>
+            <option value="AWS">AWS</option>
+            <option value="Docker">Docker</option>
+        </select>
+        <input type="hidden" name="techs" id="techsHidden">
+
+        <input type="url" name="link" placeholder="Link do projeto">
+        <input type="url" name="link_github" placeholder="Link GitHub">
+        <input type="file" name="imagens" required>
+        <button type="submit">Cadastrar Projeto</button>
+    </form>
+    <br>
+    <a href="/logout" style="color:#fff; text-decoration: underline;">Logout</a>
+</div>
+
+<script>
+// Atualiza o hidden input com as opções selecionadas
+const techSelect = document.getElementById("techSelect");
+const techsHidden = document.getElementById("techsHidden");
+
+techSelect.addEventListener("change", () => {
+    const selected = Array.from(techSelect.selectedOptions).map(opt => opt.value);
+    techsHidden.value = selected.join(",");
+});
+
+document.getElementById("projetoForm").addEventListener("submit", e => {
+    if (!techsHidden.value) {
+        alert("Selecione pelo menos uma tecnologia!");
+        e.preventDefault();
+    }
+});
+</script>
+</body>
+</html>

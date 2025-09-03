@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lalu Dev - Portfólio Espacial</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primaria: #4f46e5;
+            --secundaria: #7c3aed;
+            --acento: #f59e0b;
+            --escuro: #0f172a;
+            --maisEscuro: #0a0f1c;
+            --espacial: #1e1b4b;
+            --claro: #e2e8f0;
+            --vidro: rgba(255, 255, 255, 0.1);
+            --nebulosa: rgba(124, 58, 237, 0.2);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(ellipse at center, var(--espacial) 0%, var(--maisEscuro) 70%);
+            color: var(--claro);
+            overflow-x: hidden;
+        }
+
+        /* títulos e logo ficam com a fonte espacial */
+        h1,
+        h2,
+        h3,
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Sistema Solar de Fundo */
+        .sistema-solar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .estrelas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 30px, #fff, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: estrelasCintilando 4s ease-in-out infinite alternate;
+        }
+
+        .planeta {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primaria), var(--secundaria));
+            box-shadow: 0 0 30px var(--nebulosa);
+            animation: flutuarPlaneta 8s ease-in-out infinite;
+        }
+
+        .planeta-1 {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            right: 10%;
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
+            animation-delay: 0s;
+        }
+
+        .planeta-2 {
+            width: 120px;
+            height: 120px;
+            bottom: 30%;
+            left: 8%;
+            background: linear-gradient(45deg, var(--primaria), #06b6d4);
+            animation-delay: -2s;
+        }
+
+        .planeta-3 {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            right: 20%;
+            background: linear-gradient(45deg, var(--secundaria), #ec4899);
+            animation-delay: -4s;
+        }
+
+        /* Navegação Espacial */
+        .nav-espacial {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--vidro);
+            border-radius: 50px;
+            padding: 1rem 2rem;
+        }
+
+        .nav-lista {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--claro);
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            border-radius: 25px;
+            background: rgba(79, 70, 229, 0.2);
+            transition: all 0.3s ease;
+            z-index: 0;
+        }
+
+        .nav-link:hover::before {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--primaria);
+            transform: translateY(-1px);
+        }
+
+        .nav-link span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Botão discreto de login do administrador */
+        .btn-admin-login {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--claro);
+            border: 1px solid var(--vidro);
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            /* acima da nav */
+        }
+
+        .btn-admin-login:hover {
+            background: rgba(79, 70, 229, 0.2);
+            color: var(--primaria);
+            transform: scale(1.1);
+            box-shadow: 0 0 10px var(--primaria);
+        }
+
+        /* Seção Hero Espacial */
+        .hero-espacial {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .constelacao-skills {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .skill-estrela {
+            position: absolute;
+            background: var(--maisEscuro);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--vidro);
+            color: var(--espacial);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .skill-estrela::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primaria) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .skill-estrela:hover::before {
+            opacity: 0.3;
+        }
+
+        .skill-estrela:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px var(--primaria);
+            background: linear-gradient(45deg, var(--primaria), var(--secundaria));
+            color: white;
+        }
+
+        .skill-estrela:nth-child(1) {
+            top: 15%;
+            left: 20%;
+            width: 60px;
+            height: 60px;
+            animation: pulsarEstrela 3s ease-in-out infinite;
+        }
+
+        .skill-estrela:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            width: 70px;
+            height: 70px;
+            animation: pulsarEstrela 3s ease-in-out infinite 0.5s;
+        }
+
+        .skill-estrela:nth-child(3) {
+            bottom: 30%;
+            left: 15%;
+            width: 65px;
+            height: 65px;
+            animation: pulsarEstrela 3s ease-in-out infinite 1s;
+        }
+
+        .skill-estrela:nth-child(4) {
+            bottom: 20%;
+            right: 25%;
+            width: 60px;
+            height: 60px;
+            animation: pulsarEstrela 3s ease-in-out infinite 1.5s;
+        }
+
+        .skill-estrela:nth-child(5) {
+            top: 45%;
+            left: 10%;
+            width: 65px;
+            height: 65px;
+            animation: pulsarEstrela 3s ease-in-out infinite 2s;
+        }
+
+        .skill-estrela:nth-child(6) {
+            top: 35%;
+            right: 35%;
+            width: 70px;
+            height: 70px;
+            animation: pulsarEstrela 3s ease-in-out infinite 2.5s;
+        }
+
+        .icone-skill {
+            width: 70%;
+            max-width: 40px;
+            height: 70%;
+            object-fit: contain;
+            display: block;
+            margin: auto;
+            pointer-events: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-conteudo {
+            text-align: center;
+            z-index: 10;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .avatar-cosmico {
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            border: 4px solid var(--primaria);
+            box-shadow: 0 0 60px var(--primaria);
+            margin: 0 auto 2rem;
+            position: relative;
+            background: linear-gradient(45deg, var(--primaria), var(--secundaria));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .avatar-cosmico img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1.0);
+            z-index: 2;
+            object-position: 25% 20%;  /* 50% horizontal, 20% vertical */
+        }
+
+
+        .avatar-cosmico::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: -30px;
+            right: -30px;
+            bottom: -30px;
+            border-radius: 50%;
+            border: 2px solid var(--secundaria);
+            opacity: 0.4;
+            animation: flutuarPlaneta 5s ease-in-out infinite reverse;
+        }
+
+        .hero-titulo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primaria), var(--acento), var(--secundaria));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradienteAnimado 4s ease infinite;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitulo {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Sobre - Estação Espacial */
+        .estacao-sobre {
+            padding: 8rem 2rem;
+            position: relative;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 27, 75, 0.4) 100%);
+        }
+
+        .container-sobre {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .sobre-titulo {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, var(--primaria), var(--secundaria));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sobre-texto {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--vidro);
+            border-radius: 20px;
+            padding: 3rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sobre-texto::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .sobre-texto:hover::before {
+            left: 100%;
+        }
+
+        .sobre-texto p {
+            margin-bottom: 1.5rem;
+        }
+
+        .sobre-texto p:last-child {
+            margin-bottom: 0;
+        }
+
+        .icone-cosmico {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, var(--espacial), var(--maisEscuro));
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            animation: rotacaoCosmico 15s linear infinite;
+            /* 🔥 ESTA ANIMAÇÃO */
+            border: 3px solid var(--primaria);
+            box-shadow: 0 0 50px var(--nebulosa);
+        }
+
+        @keyframes rotacaoCosmico {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Projetos - Galáxia */
+        .galaxia-projetos {
+            padding: 8rem 2rem;
+            position: relative;
+        }
+
+        .projetos-titulo {
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            margin-bottom: 4rem;
+            background: linear-gradient(45deg, var(--primaria), var(--acento));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .projetos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .projeto-planeta {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--vidro);
+            border-radius: 25px;
+            padding: 2rem;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .projeto-planeta:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(79, 70, 229, 0.3);
+            border-color: var(--primaria);
+        }
+
+        .projeto-icone {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--primaria), var(--secundaria));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .projeto-nome {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primaria);
+        }
+
+        /* Contato - Portal Espacial */
+        .portal-contato {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, var(--espacial) 0%, var(--maisEscuro) 100%);
+            position: relative;
+        }
+
+        .contato-container {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contato-titulo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, var(--acento), var(--primaria));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .portal-form {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--vidro);
+            border-radius: 30px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 30px;
+            padding: 2px;
+            background: linear-gradient(45deg, var(--primaria), var(--acento), var(--secundaria));
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0.5;
+        }
+
+        .form-grupo {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--vidro);
+            border-radius: 15px;
+            color: var(--claro);
+            font-size: 1rem;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primaria);
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-enviar {
+            background: linear-gradient(45deg, var(--primaria), var(--acento));
+            border: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-enviar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-enviar:hover::before {
+            left: 100%;
+        }
+
+        .btn-enviar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Footer */
+        .rodape-espacial {
+            background-color: #0a0f1c;
+            padding: 2rem;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            color: #ffffff;
+        }
+
+        /* Título do footer */
+        .rodape-espacial h3 {
+            color: #9c34c2;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Container de ícones */
+        .rodape-espacial .redes {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Links de redes sociais */
+        .rodape-espacial .redes a {
+            color: #ffffff;
+            transition: color 0.3s;
+        }
+
+        /* Reduzir tamanho dos ícones do footer */
+        .rodape-espacial .redes a svg {
+            width: 40px;
+            /* largura */
+            height: 40px;
+            /* altura */
+            transition: transform 0.3s;
+            /* para efeito hover */
+        }
+
+        /* Efeito hover opcional */
+        .rodape-espacial .redes a:hover svg {
+            transform: scale(1.2);
+            /* aumenta um pouco ao passar o mouse */
+        }
+
+        /* Texto de direitos reservados */
+        .rodape-espacial p {
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+
+
+        /* Animações */
+        @keyframes estrelasCintilando {
+            0% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes flutuarPlaneta {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        @keyframes pulsarEstrela {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px var(--primaria);
+            }
+
+            50% {
+                box-shadow: 0 0 30px var(--primaria), 0 0 60px var(--secundaria);
+            }
+        }
+
+        @keyframes rotacaoCosmico {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes gradienteAnimado {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container-sobre {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .nav-espacial {
+                left: 1rem;
+                right: 1rem;
+                transform: none;
+                padding: 0.8rem 1rem;
+            }
+
+            .nav-lista {
+                gap: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .nav-link {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .skill-estrela {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 18px;
+            }
+
+            .hero-titulo {
+                font-size: 2.5rem;
+            }
+
+            .sobre-titulo,
+            .projetos-titulo,
+            .contato-titulo {
+                font-size: 2rem;
+            }
+
+            .avatar-cosmico {
+                width: 180px;
+                height: 180px;
+                font-size: 3rem;
+            }
+
+            .icone-cosmico {
+                width: 250px;
+                height: 250px;
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sistema Solar de Fundo -->
+    <div class="sistema-solar">
+        <div class="estrelas"></div>
+        <div class="planeta planeta-1"></div>
+        <div class="planeta planeta-2"></div>
+        <div class="planeta planeta-3"></div>
+    </div>
+
+    <!-- Navegação Espacial -->
+    <nav class="nav-espacial">
+        <ul class="nav-lista">
+            <li><a href="#inicio" class="nav-link"><span>INÍCIO</span></a></li>
+            <li><a href="#sobre" class="nav-link"><span>SOBRE</span></a></li>
+            <li><a href="#projetos" class="nav-link"><span>PROJETOS</span></a></li>
+            <li><a href="#contato" class="nav-link"><span>CONTATO</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Botão discreto de login do administrador -->
+    <a href="admin.html" class="btn-admin-login" title="Login Administrador">
+        🔒
+    </a>
+
+    <!-- Hero Espacial -->
+    <section id="inicio" class="hero-espacial">
+        <div class="constelacao-skills">
+            <div class="skill-estrela" title="Python">
+                <img src="img/python.png" alt="Python" class="icone-skill">
+            </div>
+            <div class="skill-estrela" title="SQL">
+                <img src="img/sql.png" alt="SQL" class="icone-skill">
+            </div>
+            <div class="skill-estrela" title="HTML">
+                <img src="img/html-5.png" alt="HTML" class="icone-skill">
+            </div>
+            <div class="skill-estrela" title="CSS">
+                <img src="img/css-3.png" alt="CSS" class="icone-skill">
+            </div>
+            <div class="skill-estrela" title="JavaScript">
+                <img src="img/javascript.png" alt="JavaScript" class="icone-skill">
+            </div>
+            <div class="skill-estrela" title="Automações">
+                <img src="img/robo.png" alt="Automações" class="icone-skill">
+            </div>
+        </div>
+
+        <div class="hero-conteudo">
+            <div class="avatar-cosmico">
+                <img src="img/foto-perfil.jpg"
+                    alt="Mulher jovem sorrindo, cabelos castanhos, usando camiseta preta, fundo desfocado com tons escuros e lilás. Expressão amigável e confiante. Ambiente transmite atmosfera tecnológica e acolhedora.">
+            </div>
+
+            <h1 class="hero-titulo">LARA LUISA</h1>
+            <p class="hero-subtitulo">Desenvolvedora Full-Stack & Analista de Dados</p>
+        </div>
+    </section>
+
+    <!-- Sobre -->
+    <section id="sobre" class="estacao-sobre">
+        <div class="container-sobre">
+            <div>
+                <h2 class="sobre-titulo">MISSÃO</h2>
+                <div class="sobre-texto">
+                    <p> Sou desenvolvedora de software e analista de dados, em constante exploração
+                        das fronteiras da tecnologia. Além disso, sou graduanda em Análise e Desenvolvimento de Sistemas
+                        pela
+                        Universidade de Fortaleza, iniciei minha trajetória na tecnologia em Engenharia da Computação no
+                        Instituto
+                        Federal do Ceará.</p>
+
+                    <p>Certificada em Data Analytics pelo Google, transformo dados em insights estratégicos, criando
+                        soluções que conectam o mundo físico ao digital. Minha missão é clara: transformar ideias em
+                        experiências digitais significativas e de alto impacto.</p>
+
+                    <p>Especializo-me em desenvolvimento de sistemas, sites, aplicativos e automações, sempre com foco
+                        em inovação e excelência. Meu objetivo é gerar resultados reais através do digital!</p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <div class="icone-cosmico">
+                    🚀
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projetos - Galáxia -->
+    <section id="projetos" class="galaxia-projetos">
+        <h2 class="projetos-titulo">UM MUNDO DE PROJETOS</h2>
+        <div class="projetos-grid">
+            <a href="projetos.html" style="text-decoration: none; color: inherit;">
+                <div class="projeto-planeta">
+                    <div class="projeto-icone"><img src="img/power-bi.png"></div>
+                    <h3 class="projeto-nome">ANÁLISE DE DADOS</h3>
+                    <p>Exploração de dados com Power BI, SQL e Excel. Transformando informações em insights valiosos
+                        para
+                        navegação estratégica no universo dos negócios.</p>
+                </div>
+            </a>
+
+            <a href="projetos.html" style="text-decoration: none; color: inherit;">
+                <div class="projeto-planeta">
+                    <div class="projeto-icone"><img src="img/tela-do-monitor.png"></div>
+                    <h3 class="projeto-nome">PLATAFORMAS DIGITAIS</h3>
+                    <p>Construção de sites, apps e sistemas com HTML, CSS e JavaScript. Criando experiências interativas
+                        que
+                        trazem sua realidade para o mundo digital.</p>
+                </div>
+            </a>
+
+            <a href="projetos.html" style="text-decoration: none; color: inherit;">
+                <div class="projeto-planeta">
+                    <div class="projeto-icone"><img src="img/robo-automacao.png"></div>
+                    <h3 class="projeto-nome">AUTOMAÇÕES</h3>
+                    <p>Desenvolvimento de soluções automatizadas e extração de dados, otimizando processos e eliminando
+                        tarefas repetitivas com precisão e eficiência.</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Contato -->
+    <section id="contato" class="portal-contato">
+        <div class="contato-container">
+            <h2 class="contato-titulo">Vamos fazer o seu projeto?</h2>
+            <form class="portal-form" action="https://formsubmit.co/laraestuda10@gmail.com" method="POST">
+                <div class="form-grupo">
+                    <input type="text" name="name" class="form-input" placeholder="Seu nome" required>
+                </div>
+                <div class="form-grupo">
+                    <input type="email" name="email" class="form-input" placeholder="Seu e-mail" required>
+                </div>
+                <div class="form-grupo">
+                    <textarea name="message" class="form-input" rows="6" placeholder="Descreva o que precisa!"
+                        required></textarea>
+                </div>
+                <button type="submit" class="btn-enviar">
+                    SOLICITE UM ORÇAMENTO
+                </button>
+                <input type="hidden" name="_captcha" value="true">
+            </form>
+        </div>
+    </section>
+
+    <footer class="rodape-espacial">
+
+        <!-- Título -->
+        <h3>MAIS CONEXÕES</h3>
+
+        <!-- Ícones -->
+        <div class="redes">
+            <a href="https://www.linkedin.com/in/lara-luisa/" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 64 64">
+                    <path fill="#9c34c2"
+                        d="M54,20c0-5.523-4.477-10-10-10H32H20c-5.523,0-10,4.477-10,10v24.008c0,5.523,4.477,10,10,10h12h12	c5.523,0,10-4.477,10-10V20z">
+                    </path>
+                    <ellipse cx="32" cy="61" opacity=".3" rx="20" ry="3"></ellipse>
+                    <path fill="#fff"
+                        d="M14.01,12H14c-2.24,1.69-3.75,4.29-3.97,7.25C10.01,19.49,10,19.75,10,20v12	c2.761,0,5-2.239,5-5v-7c0-0.108,0.003-0.221,0.017-0.38c0.102-1.375,0.778-2.65,1.862-3.525c0.048-0.033,0.095-0.068,0.142-0.103	C17.881,15.343,18.911,15,20,15h5c2.761,0,5-2.239,5-5H20C17.75,10,15.68,10.74,14.01,12z"
+                        opacity=".3"></path>
+                    <path
+                        d="M54,44V22c-2.761,0-5,2.238-5,5v17c0,2.757-2.243,5-5,5h-5c-2.761,0-5,2.238-5,5h10 C49.523,54,54,49.523,54,44z"
+                        opacity=".15"></path>
+                    <path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-miterlimit="10" stroke-width="3"
+                        d="M13.5,23.5V20c0-0.153,0.005-0.312,0.018-0.459c0.135-1.809,1.003-3.46,2.396-4.594l0.204-0.152">
+                    </path>
+                    <path fill="#a0effe"
+                        d="M19,26h4c0.552,0,1,0.448,1,1v18c0,0.552-0.448,1-1,1h-4c-0.552,0-1-0.448-1-1V27	C18,26.448,18.448,26,19,26z">
+                    </path>
+                    <path fill="#a0effe"
+                        d="M20.982,24h-0.034C19.158,24,18,22.666,18,20.999C18,19.296,19.194,18,21.017,18	c1.825,0,2.95,1.296,2.983,2.999C24,22.664,22.842,24,20.982,24z">
+                    </path>
+                    <path fill="#a0effe"
+                        d="M41,46c-0.552,0-1-0.448-1-1v-9.615c0-2.564-1.429-4.314-3.724-4.314	c-1.751,0-2.699,1.181-3.158,2.322C32.95,33.8,33,34.93,33,35.5V45c0,0.552-0.448,1-1,1h-4c-0.552,0-1-0.448-1-1V27	c0-0.552,0.448-1,1-1h4c0.552,0,1,0.448,1,1v2c0.841-1.302,2.325-3.006,5.694-3.006c4.174,0,7.304,2.797,7.304,8.659L46,45	c0,0.552-0.448,1-1,1H41z">
+                    </path>
+                </svg>
+            </a>
+            <a href="https://github.com/laraluisa-git" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="23" fill="#9c34c2"></circle>
+                    <ellipse cx="32" cy="61" opacity=".3" rx="19" ry="3"></ellipse>
+                    <path fill="#fff"
+                        d="M32,14c2.577,0,4.674-1.957,4.946-4.461C35.352,9.19,33.699,9,32,9	C19.297,9,9,19.297,9,32c0,1.699,0.19,3.352,0.539,4.946C12.044,36.674,14,34.577,14,32C14,22.075,22.075,14,32,14z"
+                        opacity=".3"></path>
+                    <path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-miterlimit="10" stroke-width="3" d="M15.047,23.427c1.878-3.699,4.932-6.705,8.666-8.522">
+                    </path>
+                    <path fill="#a0effe"
+                        d="M37.184,43.111c4.556-1.02,7.818-3.645,7.818-9.252c0-2.6-0.787-4.556-1.97-6.011	c-0.273-0.336-0.274-1.056-0.162-1.474c0.281-1.043,0.066-2.404-0.17-3.383c-0.177-0.73-0.94-1.156-1.662-0.949	c-1.707,0.491-3.115,1.466-4.138,2.136c-0.279,0.182-0.602,0.255-0.931,0.203c-1.244-0.197-2.581-0.282-3.964-0.302L32,24.113V24.08	c-1.383,0.02-2.72,0.105-3.964,0.302c-0.329,0.052-0.652-0.021-0.931-0.203c-1.023-0.669-2.431-1.644-4.138-2.136	c-0.721-0.208-1.485,0.219-1.662,0.949c-0.237,0.979-0.451,2.341-0.17,3.383c0.113,0.418,0.112,1.138-0.162,1.474	c-1.183,1.455-1.97,3.41-1.97,6.011c0,5.607,3.261,8.232,7.818,9.252c0.774,0.173,0.843,1.018,0.544,1.753	c-0.236,0.582-0.368,1.009-0.368,1.677v0.315c-0.168,0.046-0.342,0.087-0.53,0.111c-1.142,0.147-1.98,0-2.559-0.343	c-0.58-0.343-1.267-0.909-1.783-1.662c-0.435-0.635-1.375-2.003-3.596-1.949c-0.388-0.01-0.565,0.354-0.516,0.581	c0.044,0.2,0.22,0.516,0.924,0.773c0.706,0.259,1.169,0.788,1.556,1.411c0.431,0.695,0.693,2.143,2.196,3.218	c0.901,0.644,2.078,1.036,2.954,0.996c0.742-0.034,1.355,0.574,1.355,1.317l0.001,1.628c0,0.659-0.603,1.326-1.228,1.21	c1.854,0.624,4.129,0.813,6.229,0.84v-0.047l0.005,0.047c2.1-0.026,4.375-0.216,6.229-0.84c-0.625,0.115-1.228-0.552-1.228-1.21	l0.002-6.396c0-0.668-0.132-1.095-0.368-1.677C36.342,44.13,36.41,43.285,37.184,43.111z">
+                    </path>
+                    <path
+                        d="M54.461,27.054C51.956,27.326,50,29.423,50,32c0,9.925-8.075,18-18,18	c-2.577,0-4.674,1.957-4.946,4.461C28.648,54.81,30.301,55,32,55c12.703,0,23-10.297,23-23C55,30.301,54.81,28.648,54.461,27.054z"
+                        opacity=".15"></path>
+                </svg>
+            </a>
+            <a href="Em construção" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 64 64">
+                    <path fill="#9c34c2"
+                        d="M54,20v24c0,2.25-0.74,4.32-2,5.99V50c-1.69,2.24-4.29,3.75-7.25,3.97C44.51,53.99,44.25,54,44,54H20	c-5.52,0-10-4.48-10-10V20c0-0.25,0.01-0.51,0.03-0.75c0.22-2.96,1.73-5.56,3.97-7.25h0.01c1.67-1.26,3.74-2,5.99-2h24	C49.52,10,54,14.48,54,20z">
+                    </path>
+                    <path fill="#bc379c"
+                        d="M54,29.36V44c0,2.25-0.74,4.32-2,5.99V50c-1.69,2.24-4.29,3.75-7.25,3.97 C44.51,53.99,44.25,54,44,54H20c-5.52,0-10-4.48-10-10V20c0-0.25,0.01-0.51,0.03-0.75c0.22-2.96,1.73-5.56,3.97-7.25h0.01 c1.67-1.26,3.74-2,5.99-2h14.64C42.93,14.29,49.71,21.07,54,29.36z">
+                    </path>
+                    <path fill="#dd3975"
+                        d="M52,49.99V50c-1.69,2.24-4.29,3.75-7.25,3.97C44.51,53.99,44.25,54,44,54H20c-5.52,0-10-4.48-10-10 V20c0-0.25,0.01-0.51,0.03-0.75c0.22-2.96,1.73-5.56,3.97-7.25h0.01C34.99,12.01,51.99,29.01,52,49.99z">
+                    </path>
+                    <path fill="#fd3c4f"
+                        d="M45,50c0,1.34-0.09,2.67-0.25,3.97C44.51,53.99,44.25,54,44,54H20c-5.52,0-10-4.48-10-10V20 c0-0.25,0.01-0.51,0.03-0.75C11.33,19.09,12.66,19,14,19C31.12,19,45,32.88,45,50z">
+                    </path>
+                    <path fill="#fe6d42"
+                        d="M38,50c0,1.36-0.11,2.7-0.34,4H20c-5.52,0-10-4.48-10-10V26.34c1.3-0.23,2.64-0.34,4-0.34 C27.25,26,38,36.75,38,50z">
+                    </path>
+                    <path fill="#fe9d36"
+                        d="M32,50c0,1.37-0.15,2.71-0.46,4H20c-5.52,0-10-4.48-10-10V32.46c1.29-0.31,2.63-0.46,4-0.46 C23.94,32,32,40.06,32,50z">
+                    </path>
+                    <path fill="#ffce29"
+                        d="M25,50c0,1.41-0.27,2.76-0.75,4H20c-5.52,0-10-4.48-10-10v-4.25c1.24-0.48,2.59-0.75,4-0.75 C20.08,39,25,43.92,25,50z">
+                    </path>
+                    <ellipse cx="32" cy="61" opacity=".3" rx="20" ry="3"></ellipse>
+                    <g>
+                        <path fill="#fff"
+                            d="M31,15c2.761,0,5-2.238,5-5H20c-5.523,0-10,4.477-10,10v22c2.761,0,5-2.238,5-5V20 c0-2.757,2.243-5,5-5H31z"
+                            opacity=".3"></path>
+                        <path
+                            d="M54,44V22c-2.761,0-5,2.238-5,5v17c0,2.757-2.243,5-5,5H33c-2.761,0-5,2.238-5,5h16 C49.523,54,54,49.523,54,44z"
+                            opacity=".15"></path>
+                    </g>
+                    <path fill="#fff"
+                        d="M14,21.5c-0.829,0-1.5-0.671-1.5-1.5c0-4.136,3.364-7.5,7.5-7.5c0.829,0,1.5,0.671,1.5,1.5	s-0.671,1.5-1.5,1.5c-2.481,0-4.5,2.019-4.5,4.5C15.5,20.829,14.829,21.5,14,21.5z">
+                    </path>
+                    <path fill="#fff"
+                        d="M39.5,48h-15c-4.687,0-8.5-3.813-8.5-8.5v-15c0-4.687,3.813-8.5,8.5-8.5h15	c4.687,0,8.5,3.813,8.5,8.5v15C48,44.187,44.187,48,39.5,48z M24.5,19c-3.033,0-5.5,2.467-5.5,5.5v15c0,3.033,2.467,5.5,5.5,5.5h15	c3.033,0,5.5-2.467,5.5-5.5v-15c0-3.033-2.467-5.5-5.5-5.5H24.5z">
+                    </path>
+                    <path fill="#fff"
+                        d="M32,40c-4.411,0-8-3.589-8-8s3.589-8,8-8s8,3.589,8,8S36.411,40,32,40z M32,27c-2.757,0-5,2.243-5,5	s2.243,5,5,5s5-2.243,5-5S34.757,27,32,27z">
+                    </path>
+                    <circle cx="40.5" cy="23.5" r="2" fill="#fff"></circle>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Direitos reservados -->
+        <p>© 2025 Lalu Dev. Todos os direitos reservados.</p>
+
+    </footer>
+
+</body>

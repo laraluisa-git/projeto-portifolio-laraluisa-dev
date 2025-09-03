@@ -1,0 +1,29 @@
+# Dependências
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Uploads locais
+uploads/
+
+# Logs
+logs
+*.log
+*.log.*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Configurações de IDE/Editor
+.vscode/
+.idea/
+*.swp
