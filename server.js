@@ -11,7 +11,6 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ---------------- Configuração do banco ----------------
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -30,28 +29,19 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// ---------------- Diretórios ----------------
-const uploadPath = path.join(__dirname, 'public', 'upload-projetos');
-
-// Cria a pasta do volume persistente se não existir
-fs.mkdir(uploadPath, { recursive: true }).catch(console.error);
-
-// Serve imagens do volume persistente
-app.use('/uploads', express.static(uploadPath));
-
-// Serve arquivos públicos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ---------------- Upload de imagens ----------------
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadPath),
+  destination: (req, file, cb) => cb(null, 'uploads/projetos/'),
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, 'projeto-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
 
-const upload = multer({
+const upload = multer({ 
   storage,
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
@@ -60,15 +50,15 @@ const upload = multer({
     if (mimetype && extname) cb(null, true);
     else cb(new Error('Apenas imagens são permitidas!'));
   },
-  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
+  limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// ---------------- Inicialização do banco ----------------
+// ---------------- Banco de dados ----------------
 async function initDatabase() {
   try {
     const connection = await mysql.createConnection(dbConfig);
 
-    // Tabela de administradores
+    // Criar tabelas
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS administradores (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,7 +68,6 @@ async function initDatabase() {
       )
     `);
 
-    // Tabela de projetos
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS projetos (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -94,11 +83,11 @@ async function initDatabase() {
       )
     `);
 
-    // Remove projeto de exemplo
+    // Remove projeto de exemplo, se existir
     await connection.execute(`DELETE FROM projetos WHERE titulo = 'projetoExemplo'`);
 
-    // Admin padrão
-    const senhaAdmin = process.env.ADMIN_PASSWORD || 'admin';
+    // Criar usuário admin padrão
+    const senhaAdmin = process.env.ADMIN_PASSWORD;
     const senhaHash = await bcrypt.hash(senhaAdmin, 10);
     await connection.execute(`
       INSERT IGNORE INTO administradores (usuario, senha_hash) VALUES (?, ?)
@@ -150,6 +139,7 @@ app.post('/admin', async (req, res) => {
 
     req.session.adminLogado = true;
     req.session.adminId = rows[0].id;
+
     res.redirect('/admin-form.html');
   } catch (error) {
     console.error(error);
@@ -157,7 +147,7 @@ app.post('/admin', async (req, res) => {
   }
 });
 
-// ---------------- Tecnologias permitidas ----------------
+// ---------------- Tecnologias ----------------
 const tecnologiasPermitidas = [
   'html','css','javascript','typescript','react','vue','angular','svelte','next.js','nuxt.js','gatsby',
   'react native','flutter','ionic','xamarin','kotlin','swift','node.js','express','fastify','nest.js',
@@ -191,6 +181,8 @@ app.post('/admin-form', requireAuth, upload.single('imagens'), async (req, res) 
     `, [titulo, descricao, JSON.stringify(tecnologias), link, link_github, nomeImagem]);
     await connection.end();
 
+    console.log(`✅ Projeto "${titulo}" cadastrado com tecnologias: ${tecnologias.join(', ')}`);
+
     res.send(`
       <script>
         alert('Projeto cadastrado com sucesso!');
@@ -209,7 +201,7 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-// ---------------- API projetos ----------------
+// ---------------- API ----------------
 function safeJSONParse(str) {
   try {
     if (!str) return [];
@@ -235,7 +227,7 @@ app.get('/api/projetos', async (req, res) => {
       tecnologias: safeJSONParse(p.tecnologias),
       linkProjeto: p.link_projeto,
       linkGithub: p.link_github,
-      imagem: p.imagem ? `/uploads/${p.imagem}` : null,
+      imagem: p.imagem ? `/uploads/projetos/${p.imagem}` : null,
       criadoEm: p.criado_em
     }));
 
@@ -248,17 +240,23 @@ app.get('/api/projetos', async (req, res) => {
   }
 });
 
-// ---------------- API tecnologias ----------------
 app.get('/api/tecnologias', (req, res) => {
   res.json({ tecnologias: tecnologiasPermitidas.sort(), total: tecnologiasPermitidas.length });
 });
 
-// ---------------- Inicialização do servidor ----------------
+// ---------------- Inicialização ----------------
+async function createDirectories() {
+  await fs.mkdir('uploads/projetos', { recursive: true });
+}
+
 async function startServer() {
+  await createDirectories();
   await initDatabase();
+
   app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    console.log(`🗂️  Volume persistente em: ${uploadPath}`);
+    console.log(`📋 Tecnologias disponíveis: http://localhost:${PORT}/api/tecnologias`);
+    console.log(`🗂️  Projetos: http://localhost:${PORT}/api/projetos`);
   });
 }
 
