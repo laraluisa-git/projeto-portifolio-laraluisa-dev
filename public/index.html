@@ -342,7 +342,8 @@
             left: 50%;
             transform: translate(-50%, -50%) scale(1.0);
             z-index: 2;
-            object-position: 25% 20%;  /* 50% horizontal, 20% vertical */
+            object-position: 25% 20%;
+            /* 50% horizontal, 20% vertical */
         }
 
 
@@ -751,6 +752,20 @@
 
         /* Responsividade */
         @media (max-width: 768px) {
+
+            /* Ocultar todas as skills no mobile */
+            .skill-estrela {
+                display: none !important;
+            }
+
+            /* Ocultar todos os planetas no mobile */
+            .planeta-2 {
+                display: none !important;
+            }
+            .planeta-3 {
+                display: none !important;
+            }
+
             .container-sobre {
                 grid-template-columns: 1fr;
                 gap: 2rem;
@@ -780,7 +795,7 @@
                 font-size: 18px;
             }
 
-            .hero-titulo {
+            .skill .hero-titulo {
                 font-size: 2.5rem;
             }
 
