@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs').promises;
 require('dotenv').config();
 
 const app = express();
