@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs').promises;
 require('dotenv').config();
 
 const app = express();
@@ -29,12 +28,15 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve as imagens do volume persistente
+app.use('/uploads', express.static('/upload-projetos'));
+
+// Serve arquivos públicos
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ---------------- Upload de imagens ----------------
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/projetos/'),
+  destination: (req, file, cb) => cb(null, '/upload-projetos'),
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, 'projeto-' + uniqueSuffix + path.extname(file.originalname));
@@ -227,7 +229,7 @@ app.get('/api/projetos', async (req, res) => {
       tecnologias: safeJSONParse(p.tecnologias),
       linkProjeto: p.link_projeto,
       linkGithub: p.link_github,
-      imagem: p.imagem ? `/uploads/projetos/${p.imagem}` : null,
+      imagem: p.imagem ? `/uploads/${p.imagem}` : null,
       criadoEm: p.criado_em
     }));
 
@@ -245,12 +247,7 @@ app.get('/api/tecnologias', (req, res) => {
 });
 
 // ---------------- Inicialização ----------------
-async function createDirectories() {
-  await fs.mkdir('uploads/projetos', { recursive: true });
-}
-
 async function startServer() {
-  await createDirectories();
   await initDatabase();
 
   app.listen(PORT, () => {
