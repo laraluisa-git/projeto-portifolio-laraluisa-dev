@@ -34,9 +34,22 @@ app.use('/uploads', express.static('/upload-projetos'));
 // Serve arquivos públicos
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ---------------- Diretórios ----------------
+// Caminho do volume persistente do Railway
+const uploadPath = '/mnt/volume/upload-projetos';
+
+// Cria a pasta do volume se não existir
+fs.mkdir(uploadPath, { recursive: true }).catch(console.error);
+
+// Serve as imagens do volume
+app.use('/uploads', express.static(uploadPath));
+
+// Serve arquivos públicos
+app.use(express.static(path.join(__dirname, 'public')));
+
 // ---------------- Upload de imagens ----------------
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, '/upload-projetos'),
+  destination: (req, file, cb) => cb(null, uploadPath),
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, 'projeto-' + uniqueSuffix + path.extname(file.originalname));
@@ -183,8 +196,6 @@ app.post('/admin-form', requireAuth, upload.single('imagens'), async (req, res) 
     `, [titulo, descricao, JSON.stringify(tecnologias), link, link_github, nomeImagem]);
     await connection.end();
 
-    console.log(`✅ Projeto "${titulo}" cadastrado com tecnologias: ${tecnologias.join(', ')}`);
-
     res.send(`
       <script>
         alert('Projeto cadastrado com sucesso!');
@@ -203,16 +214,7 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-// ---------------- API ----------------
-function safeJSONParse(str) {
-  try {
-    if (!str) return [];
-    return Array.isArray(str) ? str : JSON.parse(str);
-  } catch {
-    return [];
-  }
-}
-
+// ---------------- API projetos ----------------
 app.get('/api/projetos', async (req, res) => {
   let connection;
   try {
@@ -229,7 +231,7 @@ app.get('/api/projetos', async (req, res) => {
       tecnologias: safeJSONParse(p.tecnologias),
       linkProjeto: p.link_projeto,
       linkGithub: p.link_github,
-      imagem: p.imagem ? `/uploads/${p.imagem}` : null,
+      imagem: p.imagem ? `/uploads/${p.imagem}` : null, // caminho do volume
       criadoEm: p.criado_em
     }));
 
@@ -242,18 +244,11 @@ app.get('/api/projetos', async (req, res) => {
   }
 });
 
-app.get('/api/tecnologias', (req, res) => {
-  res.json({ tecnologias: tecnologiasPermitidas.sort(), total: tecnologiasPermitidas.length });
-});
-
 // ---------------- Inicialização ----------------
 async function startServer() {
   await initDatabase();
-
   app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    console.log(`📋 Tecnologias disponíveis: http://localhost:${PORT}/api/tecnologias`);
-    console.log(`🗂️  Projetos: http://localhost:${PORT}/api/projetos`);
   });
 }
 
