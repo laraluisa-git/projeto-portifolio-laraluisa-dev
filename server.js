@@ -6,6 +6,7 @@ const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
+const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
 const app = express();
@@ -17,6 +18,12 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
 };
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 // ---------------- Middleware ----------------
 app.use(express.json());
@@ -41,7 +48,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
@@ -149,14 +156,14 @@ app.post('/admin', async (req, res) => {
 
 // ---------------- Tecnologias ----------------
 const tecnologiasPermitidas = [
-  'html','css','javascript','typescript','react','vue','angular','svelte','next.js','nuxt.js','gatsby',
-  'react native','flutter','ionic','xamarin','kotlin','swift','node.js','express','fastify','nest.js',
-  'python','django','flask','fastapi','php','laravel','symfony','codeigniter','java','spring','spring boot',
-  'c#','.net','.net core','ruby','rails','sinatra','go','gin','echo','rust','actix','sql','mysql','postgresql',
-  'sqlite','mariadb','mongodb','couchdb','redis','memcached','firebase','firestore','supabase','power bi','tableau',
-  'excel','google analytics','looker','aws','azure','gcp','heroku','vercel','netlify','docker','kubernetes','jenkins',
-  'github actions','git','github','gitlab','bitbucket','figma','adobe xd','sketch','photoshop','webpack','vite',
-  'parcel','rollup','jest','cypress','playwright','selenium'
+  'html', 'css', 'javascript', 'typescript', 'react', 'vue', 'angular', 'svelte', 'next.js', 'nuxt.js', 'gatsby',
+  'react native', 'flutter', 'ionic', 'xamarin', 'kotlin', 'swift', 'node.js', 'express', 'fastify', 'nest.js',
+  'python', 'django', 'flask', 'fastapi', 'php', 'laravel', 'symfony', 'codeigniter', 'java', 'spring', 'spring boot',
+  'c#', '.net', '.net core', 'ruby', 'rails', 'sinatra', 'go', 'gin', 'echo', 'rust', 'actix', 'sql', 'mysql', 'postgresql',
+  'sqlite', 'mariadb', 'mongodb', 'couchdb', 'redis', 'memcached', 'firebase', 'firestore', 'supabase', 'power bi', 'tableau',
+  'excel', 'google analytics', 'looker', 'aws', 'azure', 'gcp', 'heroku', 'vercel', 'netlify', 'docker', 'kubernetes', 'jenkins',
+  'github actions', 'git', 'github', 'gitlab', 'bitbucket', 'figma', 'adobe xd', 'sketch', 'photoshop', 'webpack', 'vite',
+  'parcel', 'rollup', 'jest', 'cypress', 'playwright', 'selenium'
 ];
 
 function processarTecnologias(techsString) {
@@ -172,13 +179,21 @@ app.post('/admin-form', requireAuth, upload.single('imagens'), async (req, res) 
   try {
     const { titulo, descricao, techs, link, link_github } = req.body;
     const tecnologias = processarTecnologias(techs);
-    const nomeImagem = req.file ? req.file.filename : null;
+    let imagemUrl = null;
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'projetos'
+      });
+      imagemUrl = result.secure_url;
+      await fs.unlink(req.file.path); // opcional: remove o arquivo local
+    }
+
 
     const connection = await mysql.createConnection(dbConfig);
     await connection.execute(`
       INSERT INTO projetos (titulo, descricao, tecnologias, link_projeto, link_github, imagem)
       VALUES (?, ?, ?, ?, ?, ?)
-    `, [titulo, descricao, JSON.stringify(tecnologias), link, link_github, nomeImagem]);
+    `, [titulo, descricao, JSON.stringify(tecnologias), link, link_github, imagemUrl]);
     await connection.end();
 
     console.log(`✅ Projeto "${titulo}" cadastrado com tecnologias: ${tecnologias.join(', ')}`);
@@ -227,7 +242,8 @@ app.get('/api/projetos', async (req, res) => {
       tecnologias: safeJSONParse(p.tecnologias),
       linkProjeto: p.link_projeto,
       linkGithub: p.link_github,
-      imagem: p.imagem ? `/uploads/projetos/${p.imagem}` : null,
+      imagem: p.imagem || null,
+
       criadoEm: p.criado_em
     }));
 
