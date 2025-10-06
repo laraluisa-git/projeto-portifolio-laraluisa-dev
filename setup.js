@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const fs = require('fs').promises;
 const path = require('path');
-require('dotenv').config();
+
 
 async function setup() {
     console.log('🚀 Iniciando configuração do Lalu Dev Backend...\n');
