@@ -7,7 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const cloudinary = require('cloudinary').v2;
-require('dotenv').config();
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +16,7 @@ const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
   database: process.env.DB_NAME
 };
 
