@@ -21,18 +21,12 @@ const connection = await mysql.createConnection({
     host: process.env.DB_HOST,       // Railway vai fornecer automaticamente
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
     database: process.env.DB_NAME    // importante incluir o nome do banco
 });
     console.log('✅ Conectado ao MySQL!');
 
-
-        // 3. Criar banco de dados se não existir
-        const dbName = process.env.DB_NAME || 'lalu_dev_portfolio';
-        await connection.execute(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
-        await connection.execute(`USE ${dbName}`);
-        console.log(`✅ Banco '${dbName}' configurado!\n`);
-
-        // 4. Criar tabelas
+        // 3. Criar tabelas
         console.log('📋 Criando tabelas...');
         
         // Tabela de administradores
