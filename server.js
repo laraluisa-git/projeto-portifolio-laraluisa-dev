@@ -7,6 +7,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const cloudinary = require('cloudinary').v2;
+const redis = require('redis');
+const connectRedis = require('connect-redis');
 
 
 const app = express();
@@ -30,15 +32,39 @@ cloudinary.config({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'lalu-dev-secret-key-2025',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
-}));
+// --- NOVO BLOCO DE SESSÃO COM REDIS ---
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.static(path.join(__dirname, 'public')));
+const RedisStore = connectRedis(session);
+
+// 1. Cria o cliente Redis, usando a REDIS_URL que o Railway injeta
+const redisClient = redis.createClient({
+    url: process.env.REDIS_URL 
+});
+
+// 2. Tratamento de erro
+redisClient.on('error', (err) => {
+    console.error('Falha na Conexão Redis (AVISO: Sessões instáveis):', err);
+});
+
+// 3. Configurar o Middleware de Sessão
+app.use(session({
+    // Usa o RedisStore para persistência
+    store: new RedisStore({ client: redisClient }), 
+    
+    // Usa a SESSION_SECRET que você configurou no Railway
+    secret: process.env.SESSION_SECRET || 'lalu-dev-secret-key-2025', // Use o fallback aqui
+    
+    resave: false,
+    saveUninitialized: false,
+    
+    // Configurações de Cookie para segurança (secure: true no Railway é obrigatório!)
+    cookie: { 
+        secure: true, // OBRIGATÓRIO: Garante segurança via HTTPS no Railway
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'lax'
+    }
+}));
 
 // ---------------- Upload de imagens ----------------
 const storage = multer.diskStorage({
