@@ -61,12 +61,13 @@ O projeto estará disponível em:
 
 🧠 Autor
 
-Lara Luísa
-🎓 Estudante de Análise e Desenvolvimento de Sistemas.
+Lara Luísa - Software Developer
 
-💡 Apaixonada por dados, desenvolvimento e design criativo.
+Estudante de Análise e Desenvolvimento de Sistemas com certificações em TI.
 
-📎 LinkedIn: https://www.linkedin.com/in/lara-luisa/
+Apaixonada por dados, desenvolvimento e design criativo.
+
+LinkedIn: https://www.linkedin.com/in/lara-luisa/
 
 🖤 Agradecimento
 
