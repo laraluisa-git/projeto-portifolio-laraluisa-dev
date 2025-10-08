@@ -63,7 +63,9 @@ O projeto estará disponível em:
 
 Lara Luísa
 🎓 Estudante de Análise e Desenvolvimento de Sistemas.
+
 💡 Apaixonada por dados, desenvolvimento e design criativo.
+
 📎 LinkedIn: https://www.linkedin.com/in/lara-luisa/
 
 🖤 Agradecimento
